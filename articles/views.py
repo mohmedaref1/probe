@@ -1,4 +1,3 @@
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.contrib.auth.decorators import login_required, user_passes_test
 from django.contrib.auth.views import LoginView, LogoutView
@@ -396,8 +395,15 @@ def upload_image(request):
     image_id = request.POST.get('image_id')
     
     try:
-        # If no article_id is provided, create a temporary article
-        if not article_id:
+        # If no article_id is provided or article doesn't exist, create a temporary article
+        article = None
+        if article_id:
+            try:
+                article = Article.objects.get(id=article_id)
+            except Article.DoesNotExist:
+                pass
+        
+        if not article:
             temp_data = generate_temp_data()
             article = Article(
                 title=temp_data['title'],
@@ -409,23 +415,8 @@ def upload_image(request):
             article.save()
             article_id = article.id
         
-        # Handle featured image
-        if image_type == 'featured':
-            try:
-                article = Article.objects.get(id=article_id)
-                article.featured_image = image
-                article.save()
-                image_url = request.build_absolute_uri(article.featured_image.url)
-                return JsonResponse({
-                    'success': True, 
-                    'image_url': image_url,
-                    'image_id': article.id,
-                    'full_url': request.build_absolute_uri(article.featured_image.url)
-                })
-            except Article.DoesNotExist:
-                return JsonResponse({'success': False, 'error': 'Article not found'})
         # Handle additional image
-        elif image_type == 'additional':
+        if image_type == 'additional':
             if image_id:
                 try:
                     article_image = ArticleImage.objects.get(id=image_id)
@@ -436,24 +427,22 @@ def upload_image(request):
                         'success': True, 
                         'image_url': image_url,
                         'image_id': article_image.id,
+                        'article_id': article.id,
                         'full_url': request.build_absolute_uri(article_image.image.url)
                     })
                 except ArticleImage.DoesNotExist:
                     return JsonResponse({'success': False, 'error': 'Image not found'})
             else:
-                try:
-                    article = Article.objects.get(id=article_id)
-                    article_image = ArticleImage(article=article, image=image)
-                    article_image.save()
-                    image_url = request.build_absolute_uri(article_image.image.url)
-                    return JsonResponse({
-                        'success': True, 
-                        'image_url': image_url,
-                        'image_id': article_image.id,
-                        'full_url': request.build_absolute_uri(article_image.image.url)
-                    })
-                except Article.DoesNotExist:
-                    return JsonResponse({'success': False, 'error': 'Article not found'})
+                article_image = ArticleImage(article=article, image=image)
+                article_image.save()
+                image_url = request.build_absolute_uri(article_image.image.url)
+                return JsonResponse({
+                    'success': True, 
+                    'image_url': image_url,
+                    'image_id': article_image.id,
+                    'article_id': article.id,
+                    'full_url': request.build_absolute_uri(article_image.image.url)
+                })
         
         return JsonResponse({'success': False, 'error': 'Invalid parameters'})
     except Exception as e:
