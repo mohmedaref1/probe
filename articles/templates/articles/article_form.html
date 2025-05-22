@@ -2,392 +2,382 @@
 
 {% block title %}
     {% if action == 'Create' %}
-        {% if LANGUAGE_CODE == 'ar' %}إنشاء مقال جديد{% else %}Create New Article{% endif %}
+        {% if LANGUAGE_CODE == 'ar' %}إنشاء مقال جديد | جيمرز اكاديمي{% else %}Create Article | Gamers Academy{% endif %}
     {% else %}
-        {% if LANGUAGE_CODE == 'ar' %}تعديل المقال{% else %}Edit Article{% endif %}
+        {% if LANGUAGE_CODE == 'ar' %}تعديل المقال | جيمرز اكاديمي{% else %}Edit Article | Gamers Academy{% endif %}
     {% endif %}
 {% endblock %}
 
+{% load static %}
 {% block extra_css %}
-<link rel="stylesheet" href="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+<link rel="stylesheet" href="/static/css/editor.css">
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
 <style>
-    .preview-container {
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        padding: 1rem;
-        margin-top: 1rem;
-        background-color: #fff;
+    .dark-mode .form-check-input:checked {
+        background-color: #0d6efd !important;
     }
-    
-    .dark-mode .preview-container {
-        background-color: #2d2d2d;
-        border-color: #444;
-        color: #e0e0e0;
-    }
-    
-    .image-preview {
-        margin: 1rem 0;
-    }
-    
-    .image-preview img {
-        max-width: 100%;
-        height: auto;
-        border-radius: 0.25rem;
-    }
-    
-    .image-upload-container {
-        margin-bottom: 1rem;
-    }
-    
-    .image-upload-preview {
-        display: flex;
-        flex-wrap: wrap;
-        gap: 1rem;
-        margin-top: 1rem;
-    }
-    
-    .image-item {
-        position: relative;
-        width: 150px;
-    }
-    
-    .image-item img {
-        width: 100%;
-        height: 150px;
-        object-fit: cover;
-        border-radius: 0.25rem;
-    }
-    
-    .image-item .delete-btn {
-        position: absolute;
-        top: 5px;
-        right: 5px;
-        background: rgba(220, 53, 69, 0.8);
-        color: white;
-        border: none;
-        border-radius: 50%;
-        width: 25px;
-        height: 25px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        cursor: pointer;
-    }
-    
-    .image-item .caption {
-        margin-top: 0.5rem;
-        font-size: 0.875rem;
-    }
-    
-    #preview-area {
-        min-height: 200px;
-        padding: 1rem;
-        border: 1px solid #ced4da;
-        border-radius: 0.25rem;
-        margin-top: 1rem;
-    }
-    
-    .dark-mode #preview-area {
-        background-color: #2d2d2d;
-        border-color: #444;
-        color: #e0e0e0;
-    }
-    
-    .format-controls {
-        margin-bottom: 1rem;
-    }
-    
-    .format-controls .btn-group {
-        width: 100%;
-    }
-    
-    .format-controls .btn {
-        flex: 1;
-    }
-    
-    .CodeMirror {
-        height: 400px !important;
-    }
-    
-    .dark-mode .CodeMirror {
-        background-color: #2d2d2d;
-        border-color: #444;
-        color: #e0e0e0;
-    }
-    
-    .dark-mode .editor-toolbar {
-        background-color: #2d2d2d;
-        border-color: #444;
-    }
-    
-    .dark-mode .editor-toolbar a {
-        color: #e0e0e0 !important;
-    }
-    
-    .dark-mode .editor-toolbar a:hover {
-        background-color: #444;
-    }
-    
-    .dark-mode .editor-toolbar.disabled-for-preview a:not(.no-disable) {
-        background: #2d2d2d;
-    }
-    
-    .dark-mode .editor-preview {
-        background-color: #2d2d2d;
-        color: #e0e0e0;
-    }
-    
-    .image-upload-form {
-        margin-top: 1rem;
-        padding: 1rem;
-        border: 1px dashed #ced4da;
-        border-radius: 0.25rem;
-        text-align: center;
-    }
-    
-    .dark-mode .image-upload-form {
-        border-color: #444;
-    }
-    
-    .image-upload-form input[type="file"] {
-        display: none;
-    }
-    
-    .image-upload-form label {
-        cursor: pointer;
-        color: #0d6efd;
-    }
-    
-    .image-upload-form label:hover {
-        text-decoration: underline;
-    }
-    
-    .upload-progress {
-        margin-top: 1rem;
-        display: none;
-    }
-    
-    .image-grid {
-        display: grid;
-        grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
-        gap: 1rem;
-        margin-top: 1rem;
-    }
+    .card {
+    height: 100%;
+}
+.editor-container {
+    display: flex;
+    flex-direction: column;
+}
+
+#editorToolbar {
+    flex-shrink: 0;
+}
+
+#article-content {
+    flex-grow: 1;
+    min-height: 300px; /* Minimum height */
+}
+
+.language-tabs {
+    margin-bottom: 0 !important;
+}
+
+.lang-tab {
+    padding: 8px 16px;
+    border: none;
+    background: none;
+    cursor: pointer;
+    position: relative;
+    margin-right: 4px;
+    color: var(--text-color);
+    margin-right: 0 !important;
+}
+
+.lang-tab.active {
+    background: var(--light-color);
+    border: 1px solid var(--border-color);
+    border-bottom-color: transparent;
+    color: var(--text-color);
+}
+
+.dark-mode .lang-tab.active {
+    background: var(--background-color);
+    border: 1px solid var(--border-color);
+    border-bottom-color: transparent;
+}
+
+.lang-tab:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+}
+
+.textarea-container textarea {
+    display: none;
+    background-color: var(--background-color);
+    color: var(--text-color);
+    border: 1px solid var(--border-color);
+    padding: 10px;
+    width: 100%;
+    resize: vertical;
+    font-family: monospace;
+}
+
+.textarea-container textarea.active {
+    display: block;
+}
+.preview-tabs {
+    background: rgba(0, 0, 0, 0.05);
+    border-radius: 4px;
+    padding: 2px;
+}
+
+.dark-mode .preview-tabs {
+    background: rgba(255, 255, 255, 0.1);
+}
+
+.preview-tab {
+    background: none;
+    border: none;
+    color: #f8f9fa;
+    opacity: 0.7;
+    padding: 4px 12px;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.preview-tab.active {
+    background: rgb(0 0 0 / 25%);
+    color: #f8f9fa;
+    border-radius: .375rem;
+    opacity: 1;
+}
+
+.dark-mode .preview-tab.active {
+    background: rgba(255, 255, 255, 0.2);
+    color: #f8f9fa;
+}
+.lang-tab:first-child {
+  border-top-left-radius: .375rem;
+}
+
+.lang-tab:last-child {
+  border-top-right-radius: .375rem;
+}
+
+[dir="rtl"] .lang-tab:first-child {
+  border-top-right-radius: .375rem;
+  border-top-left-radius: 0;
+}
+
+[dir="rtl"] .lang-tab:last-child {
+  border-top-left-radius: .375rem;
+  border-top-right-radius: 0;
+}
 </style>
 {% endblock %}
 
 {% block content %}
 <div class="container fade-in">
-    <div class="row justify-content-center">
-        <div class="col-lg-10">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1>
-                    {% if action == 'Create' %}
-                        {% if LANGUAGE_CODE == 'ar' %}إنشاء مقال جديد{% else %}Create New Article{% endif %}
-                    {% else %}
-                        {% if LANGUAGE_CODE == 'ar' %}تعديل المقال{% else %}Edit Article{% endif %}
-                    {% endif %}
-                </h1>
-                
-                {% if article %}
-                    <div class="btn-group">
-                        <a href="{% url 'article_detail' slug=article.slug %}" class="btn btn-outline-primary" target="_blank">
-                            <i class="bi bi-eye"></i> 
-                            {% if LANGUAGE_CODE == 'ar' %}معاينة{% else %}Preview{% endif %}
-                        </a>
-                        <a href="{% url 'article_delete' slug=article.slug %}" class="btn btn-outline-danger">
-                            <i class="bi bi-trash"></i> 
-                            {% if LANGUAGE_CODE == 'ar' %}حذف{% else %}Delete{% endif %}
-                        </a>
-                    </div>
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="h3 mb-0">
+                {% if action == 'Create' %}
+                    {% if LANGUAGE_CODE == 'ar' %}إنشاء مقال جديد{% else %}Create New Article{% endif %}
+                {% else %}
+                    {% if LANGUAGE_CODE == 'ar' %}تعديل المقال{% else %}Edit Article{% endif %}
+                {% endif %}
+            </h1>
+            <div class="d-flex gap-2">
+                <a href="{% url 'article_admin_list' %}" class="btn btn-outline-secondary">
+                    <i class="bi bi-arrow-left me-2"></i>
+                    {% if LANGUAGE_CODE == 'ar' %}العودة للقائمة{% else %}Back to List{% endif %}
+                </a>
+                {% if action == 'Edit' %}
+                <a href="{% url 'article_detail' slug=article.slug %}" class="btn btn-outline-primary" target="_blank">
+                    <i class="bi bi-eye me-2"></i>
+                    {% if LANGUAGE_CODE == 'ar' %}معاينة{% else %}Preview{% endif %}
+                </a>
                 {% endif %}
             </div>
+        </div>
 
-            <form method="post" enctype="multipart/form-data" id="article-form">
-                {% csrf_token %}
-                
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">
-                            {% if LANGUAGE_CODE == 'ar' %}معلومات المقال{% else %}Article Information{% endif %}
-                        </h5>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.title.id_for_label }}" class="form-label">
-                                    {% if LANGUAGE_CODE == 'ar' %}العنوان{% else %}Title{% endif %}
+        <div class="row g-4">
+            <div class="col-lg-8">
+                <form method="post" enctype="multipart/form-data" class="needs-validation" novalidate>
+                    {% csrf_token %}
+                    
+                    {% if article %}
+                    <input type="hidden" name="article_id" id="article_id" value="{{ article.id }}">
+                    {% endif %}
+                    
+                    <div class="row g-3">
+                        <!-- Title & Slug -->
+                        <div class="col-md-8">
+                            <div class="form-floating">
+                                <input type="text" name="title" id="id_title" value="{{ form.title.value|default:'' }}" 
+                                    class="form-control" placeholder=" " required>
+                                <label for="id_title">
+                                    {% if LANGUAGE_CODE == 'ar' %}عنوان المقال{% else %}Article Title{% endif %} *
                                 </label>
-                                {{ form.title }}
-                                {% if form.title.errors %}
-                                    <div class="text-danger">{{ form.title.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.slug.id_for_label }}" class="form-label">
-                                    {% if LANGUAGE_CODE == 'ar' %}الرابط المختصر{% else %}Slug{% endif %}
-                                </label>
-                                {{ form.slug }}
-                                {% if form.slug.errors %}
-                                    <div class="text-danger">{{ form.slug.errors }}</div>
-                                {% endif %}
+                                {{ form.title.errors }}
                             </div>
                         </div>
                         
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.category.id_for_label }}" class="form-label">
+                        <div class="col-md-4">
+                            <div class="form-floating">
+                                <input type="text" name="slug" id="id_slug" value="{{ form.slug.value|default:'' }}" 
+                                    class="form-control" placeholder=" " required>
+                                <label for="id_slug">
+                                    {% if LANGUAGE_CODE == 'ar' %}الرابط المختصر{% else %}Slug{% endif %} *
+                                </label>
+                                {{ form.slug.errors }}
+                            </div>
+                        </div>
+
+                        <!-- Category & Format -->
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="category" id="id_category" class="form-select">
+                                    <option value="">{% if LANGUAGE_CODE == 'ar' %}اختر تصنيف{% else %}Select category{% endif %}</option>
+                                    {% for category in categories %}
+                                        <option value="{{ category.id }}" {% if category.id == form.category.value|add:0 %}selected{% endif %}>
+                                            {{ category.name }}
+                                        </option>
+                                    {% endfor %}
+                                    <option value="new">
+                                        {% if LANGUAGE_CODE == 'ar' %}إضافة تصنيف جديد{% else %}Add new category{% endif %}
+                                    </option>
+                                </select>
+                                <label for="id_category">
                                     {% if LANGUAGE_CODE == 'ar' %}التصنيف{% else %}Category{% endif %}
                                 </label>
+                                {{ form.category.errors }}
+                            </div>
+
+                            <div class="new-category-wrapper mt-2" id="new-category-wrapper">
                                 <div class="input-group">
-                                    {{ form.category }}
-                                    <button type="button" class="btn btn-outline-secondary" id="add-category-btn">
+                                    <input type="text" name="new_category_name" id="new_category_name" class="form-control" 
+                                        placeholder="{% if LANGUAGE_CODE == 'ar' %}اسم التصنيف الجديد{% else %}New category name{% endif %}">
+                                    <button type="button" class="btn btn-success" id="add-category-btn">
                                         <i class="bi bi-plus-lg"></i>
                                     </button>
                                 </div>
-                                {% if form.category.errors %}
-                                    <div class="text-danger">{{ form.category.errors }}</div>
-                                {% endif %}
-                                
-                                <div id="new-category-form" style="display: none;" class="mt-2">
-                                    <div class="input-group">
-                                        <input type="text" class="form-control" id="new-category-name" name="new_category_name" placeholder="{% if LANGUAGE_CODE == 'ar' %}اسم التصنيف الجديد{% else %}New Category Name{% endif %}">
-                                        <button type="button" class="btn btn-success" id="save-category-btn">
-                                            <i class="bi bi-check-lg"></i>
-                                        </button>
-                                        <button type="button" class="btn btn-danger" id="cancel-category-btn">
-                                            <i class="bi bi-x-lg"></i>
-                                        </button>
-                                    </div>
-                                </div>
                             </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.tags.id_for_label }}" class="form-label">
-                                    {% if LANGUAGE_CODE == 'ar' %}الوسوم{% else %}Tags{% endif %}
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="form-floating">
+                                <select name="format" id="id_format" class="form-select" required>
+                                    {% for value, label in form.fields.format.choices %}
+                                    <option value="{{ value }}" {% if value == form.format.value %}selected{% endif %}>
+                                        {% if LANGUAGE_CODE == 'ar' %}
+                                            {% if value == 'plaintext' %}نص عادي
+                                            {% elif value == 'bbcode' %}كود منتديات
+                                            {% elif value == 'html' %}HTML
+                                            {% endif %}
+                                        {% else %}
+                                            {{ label }}
+                                        {% endif %}
+                                    </option>
+                                {% endfor %}
+                                </select>
+                                <label for="id_format">
+                                    {% if LANGUAGE_CODE == 'ar' %}تنسيق المحتوى{% else %}Content Format{% endif %} *
                                 </label>
-                                {{ form.tags }}
-                                <small class="text-muted">
-                                    {% if LANGUAGE_CODE == 'ar' %}
-                                        أدخل الوسوم مفصولة بفواصل
-                                    {% else %}
-                                        Enter tags separated by commas
+                                {{ form.format.errors }}
+                            </div>
+                        </div>
+
+                        <!-- Fullscreen Toggle -->
+                        <div class="col md-4">
+                            <div class="form-check form-switch {% if LANGUAGE_CODE == 'ar' %}form-check-reverse{% endif %}">
+                                <input class="form-check-input {% if LANGUAGE_CODE == 'ar' %}ms-2{% else %}me-2{% endif %}" 
+                                    type="checkbox" role="switch" 
+                                    id="id_fullscreen" name="fullscreen" 
+                                    {% if form.fullscreen.value %}checked{% endif %}>
+                                <label class="form-check-label d-flex align-items-center" for="id_fullscreen">
+                                    <i class="bi bi-arrows-fullscreen {% if LANGUAGE_CODE == 'ar' %}ms-2{% else %}me-2{% endif %}"></i>
+                                    {% if LANGUAGE_CODE == 'ar' %} وضع ملء الشاشة {% else %} Full Screen Mode {% endif %}
+                                </label>
+                                {{ form.fullscreen.errors }}
+                            </div>
+                        </div>
+                        <!-- Multilang Toggle -->
+                        <div class="col md-4">
+                            <div class="form-check form-switch {% if LANGUAGE_CODE == 'ar' %}form-check-reverse{% endif %}">
+                                <input class="form-check-input {% if LANGUAGE_CODE == 'ar' %}ms-2{% else %}me-2{% endif %}" 
+                                    type="checkbox" role="switch" 
+                                    id="id_multilang" name="multilang" 
+                                    {% if form.multilang.value %}checked{% endif %}>
+                                <label class="form-check-label d-flex align-items-center" for="id_multilang">
+                                    <i class="bi bi-globe {% if LANGUAGE_CODE == 'ar' %}ms-2{% else %}me-2{% endif %}"></i>
+                                    {% if LANGUAGE_CODE == 'ar' %} وضع اللغات المتعدد  {% else %} MultiLanguage Mode {% endif %}
+                                </label>
+                                {{ form.multilang.errors }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Article Content -->
+                    <div class="mb-4">
+                        <label for="article-content" class="form-label">
+                            {% if LANGUAGE_CODE == 'ar' %}محتوى المقال*{% else %}Article Content*{% endif %}
+                        </label>
+                        
+                        <div class="editor-container">
+                            <!-- BBCode Toolbar - Only visible for BBCode format -->
+                            <div class="editor-toolbar" id="editorToolbar">
+                                <button type="button" class="toolbar-btn" data-tag="b">
+                                    <i class="bi bi-type-bold"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="i">
+                                    <i class="bi bi-type-italic"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="u">
+                                    <i class="bi bi-type-underline"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="h2">
+                                    <i class="bi bi-type-h2"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="h3">
+                                    <i class="bi bi-type-h3"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="url">
+                                    <i class="bi bi-link"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="img">
+                                    <i class="bi bi-image"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="list">
+                                    <i class="bi bi-list-ul"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="*">
+                                    <i class="bi bi-dash"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="quote">
+                                    <i class="bi bi-chat-left-quote"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-tag="code">
+                                    <i class="bi bi-code"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-color="true">
+                                    <i class="bi bi-palette"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-size="true">
+                                    <i class="bi bi-text-center"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-align="left">
+                                    <i class="bi bi-text-left"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-align="center">
+                                    <i class="bi bi-text-center"></i> 
+                                </button>
+                                <button type="button" class="toolbar-btn" data-align="right">
+                                    <i class="bi bi-text-right"></i> 
+                                </button>
+                            </div>
+                            <div class="language-tabs mb-2">
+                                <button type="button" class="lang-tab active" data-target="article-content">Arabic</button>
+                                <button type="button" class="lang-tab" data-target="english-content" disabled>English</button>
+                            </div>
+                            <!-- Textareas Container -->
+                            <div class="textarea-container">
+                                <textarea name="content" id="article-content" class="form-control active" rows="12" required>{{ form.content.value|default:'' }}</textarea>
+                                <textarea name="content_en" id="english-content" class="form-control" rows="12" readonly data-initial-value="{{ form.content_en.value|default:''|escapejs }}"></textarea>
+                                {{ form.content.errors }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Article State -->
+                    <div class="mt-4">
+                        <label class="form-label d-block">
+                            {% if LANGUAGE_CODE == 'ar' %}حالة المقال{% else %}Article State{% endif %}
+                        </label>
+                        <div class="btn-group w-100" role="group">
+                            {% for value, label in form.fields.state.choices %}
+                            <input type="radio" class="btn-check" name="state" id="state_{{ value }}" value="{{ value }}"
+                                   {% if value == form.state.value %}checked{% endif %}>
+                            <label class="btn btn-outline-{% if value == 'draft' %}warning{% elif value == 'published' %}success{% else %}secondary{% endif %} flex-grow-1" 
+                                   for="state_{{ value }}">
+                                <i class="bi bi-{% if value == 'draft' %}journal{% elif value == 'published' %}globe{% else %}archive{% endif %} me-2"></i>
+                                {% if LANGUAGE_CODE == 'ar' %}
+                                    {% if value == 'draft' %}مسودة
+                                    {% elif value == 'published' %}نشر
+                                    {% else %}أرشيف
                                     {% endif %}
-                                </small>
-                                {% if form.tags.errors %}
-                                    <div class="text-danger">{{ form.tags.errors }}</div>
+                                {% else %}
+                                    {{ label }}
                                 {% endif %}
-                            </div>
+                            </label>
+                        {% endfor %}
                         </div>
-                        
-                        <div class="row">
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.format.id_for_label }}" class="form-label">
-                                    {% if LANGUAGE_CODE == 'ar' %}تنسيق المحتوى{% else %}Content Format{% endif %}
-                                </label>
-                                {{ form.format }}
-                                {% if form.format.errors %}
-                                    <div class="text-danger">{{ form.format.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-6 mb-3">
-                                <label for="{{ form.state.id_for_label }}" class="form-label">
-                                    {% if LANGUAGE_CODE == 'ar' %}الحالة{% else %}State{% endif %}
-                                </label>
-                                {{ form.state }}
-                                {% if form.state.errors %}
-                                    <div class="text-danger">{{ form.state.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
-                        
-                        <div class="row">
-                            <div class="col-md-4 mb-3">
-                                <div class="form-check">
-                                    {{ form.published }}
-                                    <label class="form-check-label" for="{{ form.published.id_for_label }}">
-                                        {% if LANGUAGE_CODE == 'ar' %}منشور{% else %}Published{% endif %}
-                                    </label>
-                                </div>
-                                {% if form.published.errors %}
-                                    <div class="text-danger">{{ form.published.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <div class="form-check">
-                                    {{ form.fullscreen }}
-                                    <label class="form-check-label" for="{{ form.fullscreen.id_for_label }}">
-                                        {% if LANGUAGE_CODE == 'ar' %}ملء الشاشة{% else %}Fullscreen{% endif %}
-                                    </label>
-                                </div>
-                                {% if form.fullscreen.errors %}
-                                    <div class="text-danger">{{ form.fullscreen.errors }}</div>
-                                {% endif %}
-                            </div>
-                            
-                            <div class="col-md-4 mb-3">
-                                <div class="form-check">
-                                    {{ form.multilang }}
-                                    <label class="form-check-label" for="{{ form.multilang.id_for_label }}">
-                                        {% if LANGUAGE_CODE == 'ar' %}متعدد اللغات{% else %}Multi-language{% endif %}
-                                    </label>
-                                </div>
-                                {% if form.multilang.errors %}
-                                    <div class="text-danger">{{ form.multilang.errors }}</div>
-                                {% endif %}
-                            </div>
-                        </div>
+                        {{ form.state.errors }}
                     </div>
-                </div>
-                
-                <!-- Arabic Content -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">
-                            {% if LANGUAGE_CODE == 'ar' %}المحتوى العربي{% else %}Arabic Content{% endif %}
-                        </h5>
-                        
-                        <div class="content-editor">
-                            {{ form.content }}
-                            {% if form.content.errors %}
-                                <div class="text-danger">{{ form.content.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="preview-container mt-3" style="display: none;">
-                            <h6>
-                                {% if LANGUAGE_CODE == 'ar' %}معاينة المحتوى{% else %}Content Preview{% endif %}
-                            </h6>
-                            <div id="preview-area"></div>
-                        </div>
+
+                    <!-- Form Actions -->
+                    <div class="mt-4">
+                        <button type="submit" class="btn btn-primary px-5">
+                            <i class="bi bi-save me-2"></i>
+                            {% if LANGUAGE_CODE == 'ar' %}حفظ التغييرات{% else %}Save Changes{% endif %}
+                        </button>
                     </div>
-                </div>
-                
-                <!-- English Content -->
-                <div class="card mb-4">
-                    <div class="card-body">
-                        <h5 class="card-title mb-3">
-                            {% if LANGUAGE_CODE == 'ar' %}المحتوى الإنجليزي{% else %}English Content{% endif %}
-                        </h5>
-                        
-                        <div class="content-editor">
-                            {{ form.content_en }}
-                            {% if form.content_en.errors %}
-                                <div class="text-danger">{{ form.content_en.errors }}</div>
-                            {% endif %}
-                        </div>
-                        
-                        <div class="preview-container mt-3" style="display: none;">
-                            <h6>
-                                {% if LANGUAGE_CODE == 'ar' %}معاينة المحتوى{% else %}Content Preview{% endif %}
-                            </h6>
-                            <div id="preview-area-en"></div>
-                        </div>
-                    </div>
-                </div>
-                
+
                 <!-- Additional Images -->
                 <div class="card mb-4">
                     <div class="card-body">
@@ -424,44 +414,363 @@
                     </div>
                 </div>
                 
-                <div class="d-flex justify-content-between">
-                    <a href="{% url 'article_admin_list' %}" class="btn btn-secondary">
-                        <i class="bi bi-arrow-left"></i>
-                        {% if LANGUAGE_CODE == 'ar' %}رجوع{% else %}Back{% endif %}
-                    </a>
-                    
-                    <button type="submit" class="btn btn-primary">
-                        <i class="bi bi-save"></i>
-                        {% if action == 'Create' %}
-                            {% if LANGUAGE_CODE == 'ar' %}إنشاء{% else %}Create{% endif %}
-                        {% else %}
-                            {% if LANGUAGE_CODE == 'ar' %}حفظ{% else %}Save{% endif %}
-                        {% endif %}
-                    </button>
+
+                </form>
+            </div>
+
+            <!-- Preview Panel -->
+            <div class="col-lg-4">
+                <div class="sticky-top" style="top: 1rem;">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white" style="
+                        height: 53px;
+                        display: flex;
+                        flex-direction: column;
+                        justify-content: center;
+                        align-items: stretch;
+                    ">
+                            <div class="d-flex justify-content-between align-items-center">
+                                <div>
+                                    <i class="bi bi-layout-text-sidebar-reverse me-2"></i>
+                                    {% if LANGUAGE_CODE == 'ar' %}معاينة مباشرة{% else %}Live Preview{% endif %}
+                                </div>
+                                <div class="preview-tabs" style="display: none;">
+                                    <button class="preview-tab active" data-lang="ar">العربية</button>
+                                    <button class="preview-tab" data-lang="en">English</button>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="card-body p-0" style="height: calc(100vh - 200px);">
+                            <iframe id="preview-iframe" class="w-100 h-100 border-0" style="height: 99%!important;"></iframe>
+                        </div>
+                    </div>
                 </div>
-            </form>
+            </div>
         </div>
     </div>
 </div>
 {% endblock %}
 
 {% block extra_js %}
-<script src="https://cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
 <script>
+
+// debounce helper
+function debounce(fn, delay=250) {
+  let t;
+  return (...args) => {
+    clearTimeout(t);
+    t = setTimeout(() => fn(...args), delay);
+  };
+}
+
+// BBCode parser (first escape any raw HTML tags)
+function parseBBCode(bb) {
+  // escape stray HTML
+  let s = bb
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;');
+
+  const map = {
+    '\\[b\\](.*?)\\[/b\\]': '<strong class="preview-strong">$1</strong>',
+    '\\[i\\](.*?)\\[/i\\]': '<em class="preview-em">$1</em>',
+    '\\[u\\](.*?)\\[/u\\]': '<u class="preview-underline">$1</u>',
+    '\\[h2\\](.*?)\\[/h2\\]': '<h2 class="preview-h2">$1</h2>',
+    '\\[h3\\](.*?)\\[/h3\\]': '<h3 class="preview-h3">$1</h3>',
+    '\\[url=(.*?)\\](.*?)\\[/url\\]': '<a href="$1" class="preview-link" target="_blank">$2</a>',
+    '\\[img\\](.*?)\\[/img\\]': '<img src="$1" class="preview-img img-fluid">',
+    '\\[list\\](.*?)\\[/list\\]': '<ul class="preview-list">$1</ul>',
+    '\\[\\*\\](.*?)': '<li class="preview-list-item">$1</li>',
+    '\\[quote\\](.*?)\\[/quote\\]': '<blockquote class="preview-blockquote">$1</blockquote>',
+    '\\[code\\](.*?)\\[/code\\]': '<pre class="preview-pre"><code class="preview-code">$1</code></pre>',
+    '\\[color=(.*?)\\](.*?)\\[/color\\]': '<span class="preview-color" style="color:$1">$2</span>',
+    '\\[size=(.*?)\\](.*?)\\[/size\\]': '<span class="preview-size" style="font-size:$1">$2</span>',
+    '\\[align=(.*?)\\](.*?)\\[/align\\]': '<div class="preview-align" style="text-align:$1">$2</div>'
+  };
+
+  for (let [pat, rep] of Object.entries(map)) {
+    s = s.replace(new RegExp(pat, 'gis'), rep);
+  }
+  return s;
+}
+
+function getTextColor() {
+        const isDark = document.body.classList.contains('dark-mode');
+        if (isDark) return '#f8f9fa';
+
+        const style = getComputedStyle(document.documentElement);
+        return style.getPropertyValue('--text-color').trim() || '#212529';
+    }
+
+// Multilang checkbox functionality
+function handleMultilangChange() {
+    const englishTab = document.querySelector('[data-target="english-content"]');
+    const englishTextarea = document.getElementById('english-content');
+    const previewTabs = document.querySelector('.preview-tabs');
+
+    if (this.checked) {
+        // Enable English elements
+        englishTab.disabled = false;
+        englishTextarea.removeAttribute('readonly');
+        // Only set value if user hasn't modified it
+        if (!englishTextarea.dataset.userModified) {
+            englishTextarea.value = "{{ form.content_en.value|default:''|escapejs }}";
+        }
+        if (previewTabs) previewTabs.style.display = 'flex';
+    } else {
+        // Disable English elements
+        englishTab.disabled = true;
+        englishTextarea.setAttribute('readonly', 'true');
+        if (previewTabs) previewTabs.style.display = 'none';
+        
+        // Switch back to Arabic if needed
+        if (englishTab.classList.contains('active')) {
+            document.querySelector('[data-target="arabic-content"]').click();
+        }
+    }
+}
+
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialize editors
-    const contentEditor = new SimpleMDE({ 
-        element: document.getElementById("article-content"),
-        spellChecker: false,
-        status: false
+
+    // Category selection and adding new category
+    const categorySelect = document.getElementById('id_category');
+    const newCategoryWrapper = document.getElementById('new-category-wrapper');
+    const newCategoryInput = document.getElementById('new_category_name');
+    const addCategoryBtn = document.getElementById('add-category-btn');
+    const editorToolbar = document.getElementById('editorToolbar');
+    const contentTextarea = document.getElementById('article-content');
+    const formatSelect = document.getElementById('id_format');
+    const iframe = document.getElementById('preview-iframe');
+    const textarea = document.getElementById('article-content');
+    const textareaen = document.getElementById('english-content');
+    const previewTabs = document.querySelector('.preview-tabs');
+    const previewTabsButtons = document.querySelectorAll('.preview-tab');
+    let activePreviewLang = 'ar';
+
+
+    const lang = document.documentElement.lang || 'en'; // Or whatever method you use
+    const message = lang === 'ar' ? 'المعاينة ستظهر هنا' : 'Preview will appear here';
+
+    iframe.srcdoc = `
+    <!doctype html>
+    <html>
+        <head>
+        <meta charset="utf-8">
+        <style>
+            body { margin: 1rem; height: 100%; font-family: sans-serif; color: ${getTextColor()} !important; }
+            .preview-link { color: #06c; word-break: break-word; }
+            .text-muted {position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%);}
+        </style>
+        </head>
+        <body>
+        <p class="text-muted">${message}</p>
+        </body>
+    </html>
+    `;
+
+
+    document.getElementById('english-content').addEventListener('input', function() {
+    this.dataset.userModified = 'true';
+});
+
+
+
+    // Tab switching functionality
+    document.querySelectorAll('.lang-tab').forEach(tab => {
+        tab.addEventListener('click', function() {
+            if (this.disabled) return;
+
+            const targetId = this.dataset.target;
+            const textarea = document.getElementById(targetId);
+
+            // Switch tabs
+            document.querySelectorAll('.lang-tab').forEach(t => t.classList.remove('active'));
+            this.classList.add('active');
+
+            // Switch textareas
+            document.querySelectorAll('.textarea-container textarea').forEach(ta => {
+                ta.classList.remove('active');
+                ta.style.display = 'none';
+            });
+            textarea.classList.add('active');
+            textarea.style.display = 'block';
+        });
     });
+
+    // Multilang checkbox functionality
+    const multilangCheckbox = document.getElementById('id_multilang');
     
-    const contentEnEditor = new SimpleMDE({ 
-        element: document.getElementById("english-content"),
-        spellChecker: false,
-        status: false
+    // Set initial state
+    handleMultilangChange.call(multilangCheckbox);
+    
+    // Add change listener
+    multilangCheckbox.addEventListener('change', handleMultilangChange);
+
+
+
+
+
+
+
+    // Update preview on content change
+    function updatePreview() {
+        const fmt = formatSelect.value;
+        const raw = activePreviewLang === 'ar' ? textarea.value : textareaen.value;
+        let html;
+
+        if (fmt === 'bbcode') {
+            html = parseBBCode(raw);
+        } else if (fmt === 'html') {
+            html = raw;
+        } else {
+            html = raw
+            .replace(/&/g, '&amp;')
+            .replace(/</g, '&lt;')
+            .replace(/>/g, '&gt;')
+            .replace(/\n/g, '<br>');
+        }
+
+        const doc = iframe.contentDocument;
+        doc.open();
+        doc.write(`
+            <html>
+                <head>
+                    <style>
+                        body {
+                            margin: 1rem;
+                            height: inherit;
+                            font-family: sans-serif;
+                            color: ${getTextColor()} !important;
+                        }
+                    </style>
+                </head>
+                <body>
+                    ${html || `
+                        <p class="text-muted" style="position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); color: ${getTextColor()} !important;">
+                        {% if LANGUAGE_CODE == 'ar' %}المعاينة ستظهر هنا{% else %}Preview will appear here{% endif %}
+                        </p>
+                    `}
+                </body>
+            </html>
+        `);
+        doc.close();
+
+        // add fade
+        doc.body.classList.remove('fade-in');
+        void doc.body.offsetWidth;
+        doc.body.classList.add('fade-in');
+    }
+
+    // Tab switching
+    previewTabsButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            previewTabsButtons.forEach(b => b.classList.remove('active'));
+            this.classList.add('active');
+            activePreviewLang = this.dataset.lang;
+            updatePreview();
+        });
     });
-    
+
+    // Multilang checkbox handler
+    document.getElementById('id_multilang').addEventListener('change', function() {
+        if (this.checked) {
+            previewTabs.style.display = 'flex';
+            // Switch to Arabic preview if English content is empty
+            if (!textareaen.value) {
+                document.querySelector('.preview-tab[data-lang="ar"]').click();
+            }
+        } else {
+            previewTabs.style.display = 'none';
+            document.querySelector('.preview-tab[data-lang="ar"]').click();
+        }
+    });
+
+    // Update event listeners for both textareas
+    textarea.addEventListener('input', debounce(updatePreview, 300));
+    textareaen.addEventListener('input', debounce(updatePreview, 300));
+
+    // Update observer to watch for tab changes
+    const observer2 = new MutationObserver(updatePreview);
+    observer2.observe(document.body, {
+        attributes: true,
+        attributeFilter: ['class', 'data-theme']
+    });
+
+    // Initial setup
+    window.addEventListener('DOMContentLoaded', () => {
+        // Hide preview tabs if multilang is disabled initially
+        if (!document.getElementById('id_multilang').checked) {
+            previewTabs.style.display = 'none';
+        }
+        updatePreview();
+    });
+
+    // Run once after page load
+    window.addEventListener('DOMContentLoaded', updatePreview);
+
+    // Update preview on textarea input
+    textarea.addEventListener('input', debounce(updatePreview, 300));
+    formatSelect.addEventListener('change', updatePreview);
+
+    // Watch for body class changes or attribute updates
+    const observer = new MutationObserver(updatePreview);
+    observer.observe(document.body, {
+    attributes: true,
+    attributeFilter: ['class', 'data-theme'] // watch any relevant attributes
+    });
+
+
+
+
+    if (editorToolbar && contentTextarea) {
+            // Show/hide toolbar based on format
+            function toggleToolbar() {
+                if (formatSelect && formatSelect.value === 'bbcode') {
+                    editorToolbar.style.display = 'flex';
+                } else {
+                    editorToolbar.style.display = 'none';
+                }
+            }
+            
+            // Initialize toolbar visibility
+            toggleToolbar();
+            
+            // Update toolbar visibility when format changes
+            if (formatSelect) {
+                formatSelect.addEventListener('change', toggleToolbar);
+            }
+            
+
+        }
+
+    // Show/hide new category input based on selection
+    if (categorySelect) {
+        categorySelect.addEventListener('change', function() {
+            if (this.value === 'new') {
+                newCategoryWrapper.style.display = 'block';
+                newCategoryInput.focus();
+            } else {
+                newCategoryWrapper.style.display = 'none';
+            }
+        });
+    }
+
+    // Handle adding a new category
+    if (addCategoryBtn) {
+        addCategoryBtn.addEventListener('click', function() {
+            const categoryName = newCategoryInput.value.trim();
+            
+            if (!categoryName) {
+                alert('{% if LANGUAGE_CODE == 'ar' %}الرجاء إدخال اسم للتصنيف{% else %}Please enter a category name{% endif %}');
+                return;
+            }
+            
+            // Submit the form to add the category
+            document.querySelector('form').submit();
+        });
+    }
+
+
     // Handle image uploads
     const imageUpload = document.getElementById('image-upload');
     const imagePreviewContainer = document.getElementById('image-preview-container');
@@ -538,84 +847,318 @@ document.addEventListener('DOMContentLoaded', function() {
         });
     });
     
-    // Category management
-    const addCategoryBtn = document.getElementById('add-category-btn');
-    const newCategoryForm = document.getElementById('new-category-form');
-    const saveCategoryBtn = document.getElementById('save-category-btn');
-    const cancelCategoryBtn = document.getElementById('cancel-category-btn');
-    const categorySelect = document.getElementById('id_category');
-    
-    addCategoryBtn.addEventListener('click', function() {
-        newCategoryForm.style.display = 'block';
-        addCategoryBtn.style.display = 'none';
-    });
-    
-    cancelCategoryBtn.addEventListener('click', function() {
-        newCategoryForm.style.display = 'none';
-        addCategoryBtn.style.display = 'block';
-        document.getElementById('new-category-name').value = '';
-    });
-    
-    // Preview functionality
-    function updatePreview() {
-        const format = document.getElementById('id_format').value;
-        const content = contentEditor.value();
-        const contentEn = contentEnEditor.value();
-        
-        // Function to render content based on format
-        function renderContent(content) {
-            switch(format) {
-                case 'plaintext':
-                    return content.replace(/\n/g, '<br>');
-                case 'bbcode':
-                    // Basic BBCode to HTML conversion
-                    return content
-                        .replace(/\[b\](.*?)\[\/b\]/g, '<strong>$1</strong>')
-                        .replace(/\[i\](.*?)\[\/i\]/g, '<em>$1</em>')
-                        .replace(/\[u\](.*?)\[\/u\]/g, '<u>$1</u>')
-                        .replace(/\[url=(.*?)\](.*?)\[\/url\]/g, '<a href="$1">$2</a>')
-                        .replace(/\[img\](.*?)\[\/img\]/g, '<img src="$1" class="img-fluid">')
-                        .replace(/\n/g, '<br>');
-                case 'html':
-                    return content;
-                default:
-                    return content;
+
+    // BBCode Toolbar Functionality
+    const toolbarButtons = document.querySelectorAll('.toolbar-btn');
+    const contentArea = document.getElementById('article-content');
+    const contentAreaen = document.getElementById('english-content');
+
+    toolbarButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Get active textarea (either Arabic or English)
+            const activeTextarea = document.querySelector('.textarea-container textarea.active');
+            if (!activeTextarea) return;
+
+            const tag = this.getAttribute('data-tag');
+            const isColor = this.getAttribute('data-color');
+            const isSize = this.getAttribute('data-size');
+            const align = this.getAttribute('data-align');
+            
+            const selectionStart = activeTextarea.selectionStart;
+            const selectionEnd = activeTextarea.selectionEnd;
+            const selectedText = activeTextarea.value.substring(selectionStart, selectionEnd);
+            
+            let insertText = '';
+            
+            if (isColor) {
+                // Simple color picker
+                const color = prompt('{% if LANGUAGE_CODE == 'ar' %}أدخل لون (مثل #ff0000 أو red){% else %}Enter color (like #ff0000 or red){% endif %}', '#1a73e8');
+                if (color) {
+                    insertText = `[color=${color}]${selectedText}[/color]`;
+                }
+            } else if (isSize) {
+                // Simple size picker
+                const size = prompt('{% if LANGUAGE_CODE == 'ar' %}أدخل الحجم (مثل 20px أو 1.5em){% else %}Enter size (like 20px or 1.5em){% endif %}', '1.2em');
+                if (size) {
+                    insertText = `[size=${size}]${selectedText}[/size]`;
+                }
+            } else if (tag === 'url') {
+                // URL tag
+                const url = prompt('{% if LANGUAGE_CODE == 'ar' %}أدخل الرابط{% else %}Enter URL{% endif %}', 'https://');
+                if (url) {
+                    insertText = `[url=${url}]${selectedText || url}[/url]`;
+                }
+            } else if (tag === 'img') {
+                // Image tag
+                const imgUrl = prompt('{% if LANGUAGE_CODE == 'ar' %}أدخل رابط الصورة{% else %}Enter image URL{% endif %}', 'https://');
+                if (imgUrl) {
+                    insertText = `[img]${imgUrl}[/img]`;
+                }
+            } else if (tag === 'list') {
+                // List tag
+                insertText = `[list]\n[*] Item 1\n[*] Item 2\n[*] Item 3\n[/list]`;
+            } else if (tag === '*') {
+                // List item
+                insertText = `[*] ${selectedText}`;
+            } else if (align) {
+                // Text alignment
+                insertText = `[align=${align}]${selectedText}[/align]`;
+            } else {
+                // Regular tags
+                insertText = `[${tag}]${selectedText}[/${tag}]`;
             }
-        }
-        
-        // Update both previews
-        document.getElementById('preview-area').innerHTML = renderContent(content);
-        document.getElementById('preview-area-en').innerHTML = renderContent(contentEn);
+            
+            if (insertText) {
+                activeTextarea.focus();
+                
+                // Insert the text at the cursor position or replace selected text
+                activeTextarea.setRangeText(
+                    insertText,
+                    selectionStart,
+                    selectionEnd,
+                    'end'
+                );
+                
+                // Trigger input event to update preview
+                activeTextarea.dispatchEvent(new Event('input'));
+            }
+        });
+    });
+
+    // Add more image form functionality
+    const addImageBtn = document.getElementById('add-image');
+    if (addImageBtn) {
+        addImageBtn.addEventListener('click', function() {
+            const formCards = document.querySelectorAll('.image-form-card');
+            const lastCard = formCards[formCards.length - 1];
+            
+            if (!lastCard) return;
+            
+            const newCard = lastCard.cloneNode(true);
+            
+            // Clear input values
+            const inputs = newCard.querySelectorAll('input');
+            inputs.forEach(input => {
+                if (input.type === 'file') {
+                    input.value = '';
+                    // Re-add event listener for the new file input
+                    input.addEventListener('change', function() {
+                        if (this.files && this.files[0]) {
+                            uploadImage(this.files[0], 'additional', this);
+                        }
+                    });
+                } else if (input.name.includes('id')) {
+                    input.value = '';
+                } else if (input.type === 'text') {
+                    input.value = '';
+                }
+            });
+            
+            // Clear preview
+            const preview = newCard.querySelector('.current-image');
+            if (preview) {
+                preview.remove();
+            }
+            
+            // Update form indices
+            const totalForms = document.getElementById('id_form-TOTAL_FORMS');
+            if (!totalForms) {
+                console.error('Total forms input not found');
+                return;
+            }
+            
+            const currentForms = parseInt(totalForms.value);
+            totalForms.value = currentForms + 1;
+            
+            // Update input names and ids in the new card
+            const formRegex = new RegExp(`form-(\\d+)-`, 'g');
+            const replacement = `form-${currentForms}-`;
+            
+            newCard.innerHTML = newCard.innerHTML.replace(formRegex, replacement);
+            
+            // Append the new card
+            lastCard.after(newCard);
+        });
+    }
+
+    // Make logout work
+    const logoutLinks = document.querySelectorAll('a[href="{% url "logout" %}"]');
+    logoutLinks.forEach(link => {
+        link.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            // Create a form to submit POST request for logout
+            const form = document.createElement('form');
+            form.method = 'POST';
+            form.action = '{% url "logout" %}';
+            
+            // Add CSRF token
+            const csrfToken = document.querySelector('input[name="csrfmiddlewaretoken"]').value;
+            const csrfInput = document.createElement('input');
+            csrfInput.type = 'hidden';
+            csrfInput.name = 'csrfmiddlewaretoken';
+            csrfInput.value = csrfToken;
+            
+            form.appendChild(csrfInput);
+            document.body.appendChild(form);
+            form.submit();
+        });
+    });
+
+    // Initial state
+    if (formatSelect.value === 'plaintext') {
+        document.querySelectorAll('.editor-toolbar button').forEach(btn => {
+            btn.disabled = true;
+            btn.classList.add('text-muted');
+        });
+    }
+});
+
+// Image Upload Function
+function uploadImage(file, type, inputElement) {
+    const formData = new FormData();
+    formData.append('image', file);
+    formData.append('type', type);
+    
+    // Get article ID if available
+    const articleIdElement = document.getElementById('article_id');
+    if (articleIdElement && articleIdElement.value) {
+        formData.append('article_id', articleIdElement.value);
     }
     
-    // Add preview button to both editors
-    contentEditor.toolbar.push({
-        name: "preview",
-        action: function() {
-            const previewContainer = contentEditor.element.closest('.card-body').querySelector('.preview-container');
-            previewContainer.style.display = previewContainer.style.display === 'none' ? 'block' : 'none';
-            updatePreview();
-        },
-        className: "fa fa-eye",
-        title: "Toggle Preview",
-    });
+    // If it's an additional image and we're updating, get the image ID
+    if (type === 'additional' && inputElement) {
+        const imageContainer = inputElement.closest('.image-form-card').querySelector('.current-image');
+        if (imageContainer) {
+            const imageId = imageContainer.dataset.imageId;
+            if (imageId) {
+                formData.append('image_id', imageId);
+            }
+        }
+    }
     
-    contentEnEditor.toolbar.push({
-        name: "preview",
-        action: function() {
-            const previewContainer = contentEnEditor.element.closest('.card-body').querySelector('.preview-container');
-            previewContainer.style.display = previewContainer.style.display === 'none' ? 'block' : 'none';
-            updatePreview();
-        },
-        className: "fa fa-eye",
-        title: "Toggle Preview",
-    });
+    // Show loading indicator
+    const loadingIndicator = document.createElement('div');
+    loadingIndicator.innerHTML = '<div class="text-center my-2"><i class="bi bi-arrow-repeat spinner"></i> Uploading...</div>';
     
-    // Update preview when content changes
-    contentEditor.codemirror.on("change", updatePreview);
-    contentEnEditor.codemirror.on("change", updatePreview);
-    document.getElementById('id_format').addEventListener('change', updatePreview);
-});
+    if (inputElement) {
+        inputElement.parentElement.appendChild(loadingIndicator);
+    }
+    
+    // Send the upload request
+    fetch('{% url "upload_image" %}', {
+        method: 'POST',
+        body: formData,
+        headers: {
+            'X-CSRFToken': document.querySelector('input[name="csrfmiddlewaretoken"]').value
+        }
+    })
+    .then(response => response.json())
+    .then(data => {
+        // Remove loading indicator
+        if (loadingIndicator) {
+            loadingIndicator.remove();
+        }
+        
+        if (data.success) {
+            // Handle successful upload
+            if (type === 'featured') {
+                // Update featured image preview
+                let container = document.querySelector('.current-featured-image');
+                
+                if (!container) {
+                    container = document.createElement('div');
+                    container.className = 'mt-2 current-featured-image image-container';
+                    container.dataset.imageId = data.image_id;
+                    featuredImageInput.parentElement.appendChild(container);
+                } else {
+                    container.innerHTML = '';
+                }
+                
+                const img = document.createElement('img');
+                img.src = data.image_url;
+                img.alt = 'Featured image';
+                img.className = 'img-fluid rounded';
+                img.style.maxHeight = '200px';
+                container.appendChild(img);
+                
+                // Add copy URL button
+                const copyBtn = document.createElement('span');
+                copyBtn.className = 'image-action-btn image-copy-btn';
+                copyBtn.onclick = function() { copyImageUrl(data.full_url || data.image_url); };
+                copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+                container.appendChild(copyBtn);
+                
+                // Add delete button
+                const deleteBtn = document.createElement('span');
+                deleteBtn.className = 'image-action-btn image-delete-btn';
+                deleteBtn.onclick = function() { deleteImage(data.image_id, this, 'featured'); };
+                deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+                container.appendChild(deleteBtn);
+                
+            } else if (type === 'additional') {
+                // Update additional image preview
+                let container;
+                
+                if (inputElement) {
+                    container = inputElement.closest('.image-form-card').querySelector('.current-image');
+                    
+                    if (!container) {
+                        container = document.createElement('div');
+                        container.className = 'mt-2 current-image image-container';
+                        container.dataset.imageId = data.image_id;
+                        inputElement.parentElement.appendChild(container);
+                    } else {
+                        container.innerHTML = '';
+                    }
+                    
+                    const img = document.createElement('img');
+                    img.src = data.image_url;
+                    img.alt = 'Additional image';
+                    img.className = 'img-fluid rounded';
+                    img.style.maxHeight = '200px';
+                    container.appendChild(img);
+                    
+                    // Add copy URL button
+                    const copyBtn = document.createElement('span');
+                    copyBtn.className = 'image-action-btn image-copy-btn';
+                    copyBtn.onclick = function() { copyImageUrl(data.full_url || data.image_url); };
+                    copyBtn.innerHTML = '<i class="bi bi-clipboard"></i>';
+                    container.appendChild(copyBtn);
+                    
+                    // Add delete button
+                    const deleteBtn = document.createElement('span');
+                    deleteBtn.className = 'image-action-btn image-delete-btn';
+                    deleteBtn.onclick = function() { deleteImage(data.image_id, this, 'additional'); };
+                    deleteBtn.innerHTML = '<i class="bi bi-trash"></i>';
+                    container.appendChild(deleteBtn);
+                    
+                    // Store the image ID in a hidden field
+                    const idInput = inputElement.closest('.image-form-card').querySelector('input[name$="-id"]');
+                    if (idInput) {
+                        idInput.value = data.image_id;
+                    }
+                }
+            }
+            
+            // Optional: Show success message
+            showNotification('{% if LANGUAGE_CODE == 'ar' %}تم رفع الصورة بنجاح{% else %}Image uploaded successfully{% endif %}', 'success');
+            
+        } else {
+            // Handle error
+            showNotification(`{% if LANGUAGE_CODE == 'ar' %}خطأ في رفع الصورة{% else %}Error uploading image{% endif %}: ${data.error}`, 'error');
+        }
+    })
+    .catch(error => {
+        // Remove loading indicator
+        if (loadingIndicator) {
+            loadingIndicator.remove();
+        }
+        
+        console.error('Upload error:', error);
+        showNotification('{% if LANGUAGE_CODE == 'ar' %}خطأ في رفع الصورة{% else %}Error uploading image{% endif %}', 'error');
+    });
+}
 
 // Image management functions
 function deleteImage(imageId) {
@@ -648,9 +1191,81 @@ function deleteImage(imageId) {
     });
 }
 
+// Copy Image URL Function
+function copyImageUrl(url) {
+    navigator.clipboard.writeText(url).then(
+        function() {
+            // Success
+            showNotification('{% if LANGUAGE_CODE == 'ar' %}تم نسخ رابط الصورة{% else %}Image URL copied to clipboard{% endif %}', 'success');
+        },
+        function() {
+            // Failure
+            showNotification('{% if LANGUAGE_CODE == 'ar' %}فشل نسخ الرابط{% else %}Failed to copy URL{% endif %}', 'error');
+        }
+    );
+}
+
+// Show Notification Function
+function showNotification(message, type = 'info') {
+    // Create notification element
+    const notification = document.createElement('div');
+    notification.className = `alert alert-${type === 'error' ? 'danger' : type} alert-dismissible fade show position-fixed`;
+    notification.style.bottom = '20px';
+    notification.style.right = '20px';
+    notification.style.zIndex = '9999';
+    notification.style.maxWidth = '300px';
+    
+    notification.innerHTML = `
+        ${message}
+        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+    `;
+    
+    // Add to document
+    document.body.appendChild(notification);
+    
+    // Remove after 5 seconds
+    setTimeout(() => {
+        notification.classList.remove('show');
+        setTimeout(() => {
+            document.body.removeChild(notification);
+        }, 150);
+    }, 5000);
+}
 function updateCaption(imageId, caption) {
     // Here you would typically send an AJAX request to update the caption
     console.log(`Updating caption for image ${imageId} to: ${caption}`);
 }
 </script>
+
+<script>
+    const isEditing = {{ isediting|yesno:"true,false" }};
+    
+    if (!isEditing) {
+        const titleInput = document.getElementById('id_title');
+        const slugInput = document.getElementById('id_slug');
+
+        if (titleInput && slugInput) {
+            titleInput.addEventListener('keyup', function () {
+                if (!slugInput.getAttribute('data-user-modified')) {
+                    const slug = this.value
+                        .toLowerCase()
+                        .replace(/[^\w\s-]/g, '')
+                        .replace(/\s+/g, '-')
+                        .replace(/-+/g, '-');
+
+                    slugInput.value = slug;
+                }
+            });
+
+            slugInput.addEventListener('change', function () {
+                if (this.value) {
+                    this.setAttribute('data-user-modified', 'true');
+                }
+            });
+        }
+    }
+</script>
+
+
+
 {% endblock %}
