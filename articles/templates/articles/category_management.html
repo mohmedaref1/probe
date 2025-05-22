@@ -1,0 +1,249 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}{% if LANGUAGE_CODE == 'ar' %}إدارة التصنيفات{% else %}Category Management{% endif %}{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">
+                {% if LANGUAGE_CODE == 'ar' %}إدارة التصنيفات{% else %}Category Management{% endif %}
+            </h1>
+            <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#addCategoryModal">
+                <i class="bi bi-plus-lg me-1"></i> 
+                {% if LANGUAGE_CODE == 'ar' %}إضافة تصنيف جديد{% else %}Add New Category{% endif %}
+            </button>
+        </div>
+
+        {% if categories %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>{% if LANGUAGE_CODE == 'ar' %}اسم التصنيف{% else %}Category Name{% endif %}</th>
+                            <th>{% if LANGUAGE_CODE == 'ar' %}الوصف{% else %}Description{% endif %}</th>
+                            <th>{% if LANGUAGE_CODE == 'ar' %}الرابط المختصر{% else %}Slug{% endif %}</th>
+                            <th>{% if LANGUAGE_CODE == 'ar' %}الإجراءات{% else %}Actions{% endif %}</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for category in categories %}
+                            <tr>
+                                <td>{{ category.name }}</td>
+                                <td>{{ category.description|truncatechars:50 }}</td>
+                                <td>{{ category.slug }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button type="button" class="btn btn-outline-primary edit-category" 
+                                                data-id="{{ category.id }}"
+                                                data-name="{{ category.name }}"
+                                                data-description="{{ category.description }}"
+                                                data-slug="{{ category.slug }}">
+                                            <i class="bi bi-pencil"></i>
+                                        </button>
+                                        <button type="button" class="btn btn-outline-danger delete-category" 
+                                                data-id="{{ category.id }}"
+                                                data-name="{{ category.name }}">
+                                            <i class="bi bi-trash"></i>
+                                        </button>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="alert alert-info">
+                {% if LANGUAGE_CODE == 'ar' %}
+                    لا توجد تصنيفات حالياً. أضف تصنيفاً جديداً للبدء.
+                {% else %}
+                    No categories found. Add a new category to get started.
+                {% endif %}
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<!-- Add Category Modal -->
+<div class="modal fade" id="addCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {% if LANGUAGE_CODE == 'ar' %}إضافة تصنيف جديد{% else %}Add New Category{% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="addCategoryForm" method="post">
+                {% csrf_token %}
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            {% if LANGUAGE_CODE == 'ar' %}اسم التصنيف{% else %}Category Name{% endif %}
+                        </label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            {% if LANGUAGE_CODE == 'ar' %}الوصف{% else %}Description{% endif %}
+                        </label>
+                        <textarea name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            {% if LANGUAGE_CODE == 'ar' %}الرابط المختصر{% else %}Slug{% endif %}
+                        </label>
+                        <input type="text" name="slug" class="form-control" required>
+                        <div class="form-text slug-availability"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        {% if LANGUAGE_CODE == 'ar' %}إلغاء{% else %}Cancel{% endif %}
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        {% if LANGUAGE_CODE == 'ar' %}حفظ{% else %}Save{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Edit Category Modal -->
+<div class="modal fade" id="editCategoryModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">
+                    {% if LANGUAGE_CODE == 'ar' %}تعديل التصنيف{% else %}Edit Category{% endif %}
+                </h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <form id="editCategoryForm" method="post">
+                {% csrf_token %}
+                <input type="hidden" name="category_id">
+                <div class="modal-body">
+                    <div class="mb-3">
+                        <label class="form-label">
+                            {% if LANGUAGE_CODE == 'ar' %}اسم التصنيف{% else %}Category Name{% endif %}
+                        </label>
+                        <input type="text" name="name" class="form-control" required>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            {% if LANGUAGE_CODE == 'ar' %}الوصف{% else %}Description{% endif %}
+                        </label>
+                        <textarea name="description" class="form-control" rows="3"></textarea>
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">
+                            {% if LANGUAGE_CODE == 'ar' %}الرابط المختصر{% else %}Slug{% endif %}
+                        </label>
+                        <input type="text" name="slug" class="form-control" required>
+                        <div class="form-text slug-availability"></div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                        {% if LANGUAGE_CODE == 'ar' %}إلغاء{% else %}Cancel{% endif %}
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        {% if LANGUAGE_CODE == 'ar' %}حفظ التغييرات{% else %}Save Changes{% endif %}
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+{% endblock %}
+
+{% block extra_js %}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Slug availability check
+    const slugInputs = document.querySelectorAll('input[name="slug"]');
+    slugInputs.forEach(input => {
+        input.addEventListener('input', debounce(checkSlugAvailability, 500));
+    });
+
+    function checkSlugAvailability(e) {
+        const slug = e.target.value;
+        const availabilityDiv = e.target.nextElementSibling;
+        
+        if (!slug) {
+            availabilityDiv.textContent = '';
+            return;
+        }
+
+        fetch(`/check-slug/?slug=${slug}`)
+            .then(response => response.json())
+            .then(data => {
+                if (data.available) {
+                    availabilityDiv.textContent = '✓ متاح';
+                    availabilityDiv.className = 'form-text text-success';
+                } else {
+                    availabilityDiv.textContent = '✗ مستخدم';
+                    availabilityDiv.className = 'form-text text-danger';
+                }
+            });
+    }
+
+    function debounce(func, wait) {
+        let timeout;
+        return function executedFunction(...args) {
+            const later = () => {
+                clearTimeout(timeout);
+                func(...args);
+            };
+            clearTimeout(timeout);
+            timeout = setTimeout(later, wait);
+        };
+    }
+
+    // Edit category
+    const editButtons = document.querySelectorAll('.edit-category');
+    editButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const modal = document.getElementById('editCategoryModal');
+            const form = modal.querySelector('form');
+            
+            form.querySelector('input[name="category_id"]').value = this.dataset.id;
+            form.querySelector('input[name="name"]').value = this.dataset.name;
+            form.querySelector('textarea[name="description"]').value = this.dataset.description;
+            form.querySelector('input[name="slug"]').value = this.dataset.slug;
+            
+            new bootstrap.Modal(modal).show();
+        });
+    });
+
+    // Delete category
+    const deleteButtons = document.querySelectorAll('.delete-category');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const categoryName = this.dataset.name;
+            const categoryId = this.dataset.id;
+            
+            if (confirm(`هل أنت متأكد من حذف التصنيف "${categoryName}"؟`)) {
+                fetch(`/delete-category/${categoryId}/`, {
+                    method: 'POST',
+                    headers: {
+                        'X-CSRFToken': document.querySelector('[name=csrfmiddlewaretoken]').value
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        location.reload();
+                    } else {
+                        alert('حدث خطأ أثناء حذف التصنيف');
+                    }
+                });
+            }
+        });
+    });
+});
+</script>
+{% endblock %}

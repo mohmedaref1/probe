@@ -1,0 +1,136 @@
+{% extends 'articles/base.html' %}
+
+{% block title %}Articles | Article Publisher{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <div class="row mb-4">
+        <div class="col-md-8">
+            <h1 class="mb-4">{% if LANGUAGE_CODE == 'ar' %}المقالات{% else %}Articles{% endif %}</h1>
+        </div>
+        <div class="col-md-4">
+            <form method="get" class="mb-4">
+                <div class="input-group">
+                    <input type="text" name="query" class="form-control" placeholder="{% if LANGUAGE_CODE == 'ar' %}ابحث في المقالات...{% else %}Search articles...{% endif %}" value="{{ request.GET.query|default:'' }}">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-search"></i>
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+    
+    <div class="row">
+        <div class="col-lg-8">
+            {% if articles %}
+                {% for article in articles %}
+                    <div class="card mb-4 fade-in" style="animation-delay: {{ forloop.counter0 }}00ms">
+                        <div class="card-body" style="padding-bottom: 0; overflow: hidden;">
+                            <h2 class="card-title h4">
+                                <a href="{% url 'article_detail' slug=article.slug %}" class="text-decoration-none text-dark">
+                                    {{ article.title }}
+                                </a>
+                            </h2>
+                            <div class="article-meta mb-2">
+                                <i class="bi bi-calendar me-1"></i> {{ article.created_at|date:"F j, Y" }}
+                                {% if article.category %}
+                                <span class="mx-2">|</span>
+                                <i class="bi bi-folder me-1"></i> {{ article.category.name }}
+                                {% endif %}
+                            </div>
+                            
+                            <div class="card-text-container">
+                            <p class="card-text">{{ article.render_content|safe }}</p>
+                        </div>
+                            {% if article.tags.all %}
+                                <div class="mb-3">
+                                    {% for tag in article.tags.all %}
+                                        <span class="tag">{{ tag.name }}</span>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <div class="card-btn-container">
+                            <a href="{% url 'article_detail' slug=article.slug %}" class="btn btn-sm btn-primary" target="_blank">
+                                {% if LANGUAGE_CODE == 'ar' %}متابعة القراءة{% else %}Continue Reading{% endif %} <i class="bi bi-arrow-right ms-1"></i>
+                            </a>
+                            </div>
+                        </div>
+                    </div>
+                {% endfor %}
+            {% else %}
+                <div class="card">
+                    <div class="card-body text-center py-5">
+                        <i class="bi bi-journal-x text-muted mb-3" style="font-size: 3rem;"></i>
+                        <h3>No Articles Found</h3>
+                        <p class="text-muted">There are no published articles matching your criteria.</p>
+                    </div>
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="col-lg-4">
+            <div class="card mb-4">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-funnel me-2"></i> {% if LANGUAGE_CODE == 'ar' %}تصفية المقالات{% else %}Filter Articles{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <form method="get">
+                        {% if request.GET.query %}
+                            <input type="hidden" name="query" value="{{ request.GET.query }}">
+                        {% endif %}
+                        
+                        <div class="mb-3">
+                            <label for="id_category" class="form-label">{% if LANGUAGE_CODE == 'ar' %}الفئة{% else %}Category{% endif %}</label>
+                            <select name="category" id="id_category" class="form-select">
+                                <option value="">{% if LANGUAGE_CODE == 'ar' %}كل الفئات{% else %}All Categories{% endif %}</option>
+                                {% for category in categories %}
+                                    <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"i" %}selected{% endif %}>
+                                        {{ category.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="mb-3">
+                            <label for="id_tag" class="form-label">{% if LANGUAGE_CODE == 'ar' %}الوسم{% else %}Tag{% endif %}</label>
+                            <select name="tag" id="id_tag" class="form-select">
+                                <option value="">{% if LANGUAGE_CODE == 'ar' %}كل الوسوم{% else %}All Tags{% endif %}</option>
+                                {% for tag in tags %}
+                                    <option value="{{ tag.id }}" {% if request.GET.tag == tag.id|stringformat:"i" %}selected{% endif %}>
+                                        {{ tag.name }}
+                                    </option>
+                                {% endfor %}
+                            </select>
+                        </div>
+                        
+                        <div class="d-grid">
+                            <button type="submit" class="btn btn-primary">
+                                {% if LANGUAGE_CODE == 'ar' %}تطبيق الفلاتر{% else %}Apply Filters{% endif %}
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+            
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h5 class="mb-0">
+                        <i class="bi bi-tags me-2"></i> {% if LANGUAGE_CODE == 'ar' %}الوسوم الشائعة{% else %}Popular Tags{% endif %}
+                    </h5>
+                </div>
+                <div class="card-body">
+                    <div class="d-flex flex-wrap">
+                        {% for tag in tags %}
+                            <a href="?tag={{ tag.id }}" class="tag mb-2">{{ tag.name }}</a>
+                        {% empty %}
+                            <p class="text-muted">{% if LANGUAGE_CODE == 'ar' %}لا توجد وسوم متاحة{% else %}No tags available{% endif %}</p>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

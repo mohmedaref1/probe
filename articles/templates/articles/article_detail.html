@@ -1,0 +1,269 @@
+{% extends 'articles/base.html' %}
+
+<title>{% block title %}{{ article.title }} | {% if LANGUAGE_CODE == 'ar' %}جيمرز اكاديمي{% else %}Gamers Academy{% endif %}{% endblock %}</title>
+{% load static %}
+{% block extra_css %}
+<link rel="stylesheet" type="text/css" href="{% static 'css/style.css' %}">
+<style>
+
+.card {
+    width: 100%;
+    max-width: unset;
+    height: 100%;
+    padding: 0;
+    margin: 0;
+}
+.card-body {
+    max-height: unset !important;
+    overflow: auto !important;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+main.main-content {
+    height: 100vh;
+}
+.container {
+    height: 100%;
+    align-content: center;
+    align-items: center;
+}
+.row {
+    height: 95%;
+}
+/* Add responsive styles for tables */
+@media (max-width: 600px) {
+    .article-content.mb-4 {
+    margin-top: 40px;
+}
+}
+
+.article-page {
+  min-height: 100vh;
+  background-color: var(--background-color);
+  color: var(--text-color);
+  font-family: -apple-system, system-ui, sans-serif;
+  transition: all var(--transition-speed) ease;
+  position: relative;
+  padding: 1rem;
+}
+
+.container {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 2rem 1rem;
+}
+
+.article-container {
+  display: flex;
+  justify-content: center;
+  width: 100%;
+  min-height: 80vh;
+}
+
+.article-card {
+  background-color: var(--card-background);
+  border-radius: var(--border-radius);
+  box-shadow: var(--shadow);
+  width: 100%;
+  transition: all var(--transition-speed) ease;
+  overflow: hidden;
+}
+
+.article-content {
+  padding: 3rem;
+  line-height: 1.6;
+}
+
+.language-switcher {
+  position: fixed;
+  top: 1rem;
+  right: 1rem;
+  z-index: 100;
+  display: flex;
+  background: var(--switch-bg);
+  border-radius: 24px;
+  padding: 4px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+.dark-mode .language-switcher {
+  box-shadow: 0 2px 8px rgba(255, 254, 254, 0.1);
+}
+.switch-option {
+  padding: 8px 16px;
+  border-radius: 20px;
+  cursor: pointer;
+  position: relative;
+  z-index: 2;
+  color: var(--switch-text);
+  font-weight: 600;
+  transition: all var(--transition-speed) ease;
+}
+
+.switch-option.active {
+    color: #f8f9fa;
+}
+
+.active-indicator {
+  position: absolute;
+  background: linear-gradient(135deg, #3f5efb 0%, #fc466b 100%);
+  border-radius: 20px;
+  transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
+  z-index: 1;
+  top: 4px;
+  bottom: 4px;
+  color: #f8f9fa;
+}
+
+.lang-content {
+  display: none;
+  opacity: 0;
+  transition: opacity var(--transition-speed) ease;
+}
+
+.lang-content.active {
+  display: block;
+  opacity: 1;
+  animation: fadeIn 0.4s ease;
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(5px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+@media (max-width: 768px) {
+  .article-content {
+    padding: 2rem;
+  }
+  
+  
+  .article-card {
+    border-radius: 12px;
+  }
+}
+
+@media (max-width: 480px) {
+  .article-content {
+    padding: 1.5rem;
+  }
+  
+  .switch-option {
+    padding: 6px 12px;
+    font-size: 14px;
+  }
+}
+
+.content-container {
+    height: calc(100% - 62px);
+}
+.container {
+    position: fixed;
+    top: 12px;
+    bottom: 0;
+    right: 0;
+    left: 0;
+}
+.dark-mode .card-body {
+  box-shadow: 0 2px 8px rgba(255, 254, 254, 0.1);
+}
+#theme-toggle {
+    display: flex;
+    left: 10px;
+    width: 40px;
+    height: 40px;
+    border: 2px solid;
+    border-radius: 50%;
+    align-content: center;
+    justify-content: center;
+    align-items: center;
+}
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="article-page">
+    {% if multilang %}
+    <div class="language-switcher">
+      <div class="active-indicator"></div>
+      <div class="switch-option active" data-tab="1">AR</div>
+      <div class="switch-option" data-tab="2">EN</div>
+    </div>
+    {% endif %}
+    
+    <div class="container fade-in">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card mb-4">
+                    <div class="card-body p-md-5 p-4">
+                        <div class="article-content mb-4">
+                            {% if multilang %}
+                                <div class="lang-content active" id="content-ar">
+                                    {{ rendered_content }}
+                                </div>
+                                <div class="lang-content" id="content-en">
+                                    {{ rendered_content_en }}
+                                </div>
+                            {% else %}
+                                {{ rendered_content }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Initialize Bootstrap tabs if needed
+        if(document.querySelector('.nav-tabs')) {
+            new bootstrap.Tab(document.querySelector('.nav-tabs .nav-link'));
+        }
+    });
+</script>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const switcher = document.querySelector('.language-switcher');
+        const options = document.querySelectorAll('.switch-option');
+        const indicator = document.querySelector('.active-indicator');
+        const arContent = document.getElementById('content-ar');
+        const enContent = document.getElementById('content-en');
+    
+        // Initialize from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialTab = urlParams.get('tap') || '1';
+        
+        function activateTab(tab) {
+            options.forEach(opt => opt.classList.remove('active'));
+            const activeOpt = Array.from(options).find(opt => opt.dataset.tab === tab);
+            activeOpt.classList.add('active');
+            
+            // Update indicator position
+            const { offsetLeft: left, offsetWidth: width } = activeOpt;
+            indicator.style.cssText = `left: ${left}px; width: ${width}px;`;
+            
+            // Toggle content
+            arContent.classList.toggle('active', tab === '1');
+            enContent.classList.toggle('active', tab === '2');
+        }
+    
+        // Set initial state
+        activateTab(initialTab);
+    
+        // Handle tab clicks
+        options.forEach(opt => {
+            opt.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                history.replaceState(null, '', `?tap=${tab}`);
+                activateTab(tab);
+            });
+        });
+    
+        // Handle browser navigation
+        window.addEventListener('popstate', () => {
+            const tab = new URLSearchParams(window.location.search).get('tap') || '1';
+            activateTab(tab);
+        });
+    });
+    </script>
+{% endblock %}

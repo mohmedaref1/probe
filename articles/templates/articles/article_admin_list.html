@@ -1,0 +1,325 @@
+
+{% extends 'articles/base.html' %}
+
+{% block title %}
+    {% if LANGUAGE_CODE == 'ar' %}إدارة المقالات | جيمرز اكاديمي{% else %}Manage Articles | Gamers Academy{% endif %}
+{% endblock %}
+
+{% block content %}
+<div class="container fade-in">
+    <div class="admin-content">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1 class="mb-0">
+                {% if LANGUAGE_CODE == 'ar' %}إدارة المقالات{% else %}Manage Articles{% endif %}
+            </h1>
+            <a href="{% url 'article_create' %}" class="btn btn-primary">
+                <i class="bi bi-plus-lg me-1"></i> 
+                {% if LANGUAGE_CODE == 'ar' %}مقال جديد{% else %}New Article{% endif %}
+            </a>
+        </div>
+        
+        <div class="card mb-4">
+            <div class="card-body">
+                <form method="get" class="row g-3">
+                    <div class="col-lg-5 col-md-6">
+                        <input type="text" name="query" class="form-control" placeholder="{% if LANGUAGE_CODE == 'ar' %}بحث عن مقالات...{% else %}Search articles...{% endif %}" value="{{ request.GET.query|default:'' }}">
+                    </div>
+                    <div class="col-lg-3 col-md-6">
+                        <select name="state" class="form-select">
+                            <option value="" {% if not request.GET.state %}selected{% endif %}>
+                                {% if LANGUAGE_CODE == 'ar' %}جميع الحالات{% else %}All States{% endif %}
+                            </option>
+                            <option value="draft" {% if request.GET.state == 'draft' %}selected{% endif %}>
+                                {% if LANGUAGE_CODE == 'ar' %}مسودة{% else %}Draft{% endif %}
+                            </option>
+                            <option value="published" {% if request.GET.state == 'published' %}selected{% endif %}>
+                                {% if LANGUAGE_CODE == 'ar' %}منشور{% else %}Published{% endif %}
+                            </option>
+                            <option value="archived" {% if request.GET.state == 'archived' %}selected{% endif %}>
+                                {% if LANGUAGE_CODE == 'ar' %}أرشيف{% else %}Archived{% endif %}
+                            </option>
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <select name="category" class="form-select">
+                            <option value="" {% if not request.GET.category %}selected{% endif %}>
+                                {% if LANGUAGE_CODE == 'ar' %}جميع التصنيفات{% else %}All Categories{% endif %}
+                            </option>
+                            {% for category in categories %}
+                                <option value="{{ category.id }}" {% if request.GET.category == category.id|stringformat:"i" %}selected{% endif %}>
+                                    {{ category.name }}
+                                </option>
+                            {% endfor %}
+                        </select>
+                    </div>
+                    <div class="col-lg-2 col-md-6">
+                        <button type="submit" class="btn btn-primary w-100">
+                            <i class="bi bi-search"></i> 
+                            {% if LANGUAGE_CODE == 'ar' %}بحث{% else %}Search{% endif %}
+                        </button>
+                    </div>
+                </form>
+            </div>
+        </div>
+        
+        <!-- Active Articles (Published & Draft) -->
+        <h2 class="mt-5 mb-3">
+            {% if LANGUAGE_CODE == 'ar' %}المقالات النشطة{% else %}Active Articles{% endif %}
+        </h2>
+        
+        {% if active_articles %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>
+                                {% if LANGUAGE_CODE == 'ar' %}العنوان{% else %}Title{% endif %}
+                            </th>
+                            <th class="d-none d-md-table-cell">
+                                {% if LANGUAGE_CODE == 'ar' %}المؤلف{% else %}Author{% endif %}
+                            </th>
+                            <th class="d-none d-md-table-cell">
+                                {% if LANGUAGE_CODE == 'ar' %}التصنيف{% else %}Category{% endif %}
+                            </th>
+                            <th class="d-none d-lg-table-cell">
+                                {% if LANGUAGE_CODE == 'ar' %}تاريخ الإنشاء{% else %}Created{% endif %}
+                            </th>
+                            <th>
+                                {% if LANGUAGE_CODE == 'ar' %}الحالة{% else %}Status{% endif %}
+                            </th>
+                            <th>
+                                {% if LANGUAGE_CODE == 'ar' %}الإجراءات{% else %}Actions{% endif %}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in active_articles %}
+                            <tr>
+                                <td>
+                                    <a href="{% url 'article_detail' slug=article.slug %}" class="text-decoration-none">
+                                        {{ article.title }}
+                                    </a>
+                                    <div class="d-md-none mt-1 small text-muted">
+                                        {{ article.author.get_full_name|default:article.author.username }} - 
+                                        {{ article.created_at|date:"M d, Y" }}
+                                    </div>
+                                </td>
+                                <td class="d-none d-md-table-cell">{{ article.author.get_full_name|default:article.author.username }}</td>
+                                <td class="d-none d-md-table-cell">{{ article.category.name|default:"-" }}</td>
+                                <td class="d-none d-lg-table-cell">{{ article.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="dropdown">
+                                        <button class="btn btn-sm dropdown-toggle article-status-btn 
+                                            {% if article.state == 'published' %}btn-outline-success
+                                            {% elif article.state == 'archived' %}btn-outline-secondary
+                                            {% else %}btn-outline-warning{% endif %}" 
+                                            type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                            
+                                            {% if article.state == 'published' %}
+                                                <i class="bi bi-check-circle me-1"></i>
+                                                {% if LANGUAGE_CODE == 'ar' %}منشور{% else %}Published{% endif %}
+                                            {% elif article.state == 'archived' %}
+                                                <i class="bi bi-archive me-1"></i>
+                                                {% if LANGUAGE_CODE == 'ar' %}أرشيف{% else %}Archived{% endif %}
+                                            {% else %}
+                                                <i class="bi bi-pencil-square me-1"></i>
+                                                {% if LANGUAGE_CODE == 'ar' %}مسودة{% else %}Draft{% endif %}
+                                            {% endif %}
+                                        </button>
+                                        <ul class="dropdown-menu dropdown-menu-end">
+                                            <li>
+                                                <a class="dropdown-item {% if article.state == 'draft' %}active{% endif %}" 
+                                                   href="javascript:void(0)" 
+                                                   onclick="updateArticleState('{{ article.id }}', 'draft')">
+                                                    <i class="bi bi-pencil-square me-1"></i>
+                                                    {% if LANGUAGE_CODE == 'ar' %}مسودة{% else %}Draft{% endif %}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item {% if article.state == 'published' %}active{% endif %}" 
+                                                   href="javascript:void(0)" 
+                                                   onclick="updateArticleState('{{ article.id }}', 'published')">
+                                                    <i class="bi bi-check-circle me-1"></i>
+                                                    {% if LANGUAGE_CODE == 'ar' %}منشور{% else %}Published{% endif %}
+                                                </a>
+                                            </li>
+                                            <li>
+                                                <a class="dropdown-item {% if article.state == 'archived' %}active{% endif %}" 
+                                                   href="javascript:void(0)" 
+                                                   onclick="updateArticleState('{{ article.id }}', 'archived')">
+                                                    <i class="bi bi-archive me-1"></i>
+                                                    {% if LANGUAGE_CODE == 'ar' %}أرشيف{% else %}Archived{% endif %}
+                                                </a>
+                                            </li>
+                                        </ul>
+                                    </div>
+                                </td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <a href="{% url 'article_edit' slug=article.slug %}" class="btn btn-outline-primary">
+                                            <i class="bi bi-pencil"></i>
+                                        </a>
+                                        <a href="{% url 'article_detail' slug=article.slug %}" target="_blank" class="btn btn-outline-secondary">
+                                            <i class="bi bi-eye"></i>
+                                        </a>
+                                        <a href="{% url 'article_delete' slug=article.slug %}" class="btn btn-outline-danger">
+                                            <i class="bi bi-trash"></i>
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-5">
+                    <i class="bi bi-journal-x text-muted mb-3" style="font-size: 3rem;"></i>
+                    <h3>
+                        {% if LANGUAGE_CODE == 'ar' %}لا توجد مقالات نشطة{% else %}No Active Articles{% endif %}
+                    </h3>
+                    <p class="text-muted">
+                        {% if LANGUAGE_CODE == 'ar' %}ابدأ بإنشاء مقالك الأول{% else %}Get started by creating your first article{% endif %}
+                    </p>
+                    <a href="{% url 'article_create' %}" class="btn btn-primary mt-3">
+                        <i class="bi bi-plus-lg me-1"></i> 
+                        {% if LANGUAGE_CODE == 'ar' %}إنشاء مقال{% else %}Create Article{% endif %}
+                    </a>
+                </div>
+            </div>
+        {% endif %}
+        
+        <!-- Archived Articles -->
+        <h2 class="mt-5 mb-3">
+            {% if LANGUAGE_CODE == 'ar' %}المقالات المؤرشفة{% else %}Archived Articles{% endif %}
+        </h2>
+        
+        {% if archived_articles_list %}
+            <div class="table-responsive">
+                <table class="table table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>
+                                {% if LANGUAGE_CODE == 'ar' %}العنوان{% else %}Title{% endif %}
+                            </th>
+                            <th class="d-none d-md-table-cell">
+                                {% if LANGUAGE_CODE == 'ar' %}المؤلف{% else %}Author{% endif %}
+                            </th>
+                            <th class="d-none d-md-table-cell">
+                                {% if LANGUAGE_CODE == 'ar' %}التصنيف{% else %}Category{% endif %}
+                            </th>
+                            <th class="d-none d-lg-table-cell">
+                                {% if LANGUAGE_CODE == 'ar' %}تاريخ الإنشاء{% else %}Created{% endif %}
+                            </th>
+                            <th>
+                                {% if LANGUAGE_CODE == 'ar' %}الإجراءات{% else %}Actions{% endif %}
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for article in archived_articles_list %}
+                            <tr>
+                                <td>
+                                    {{ article.title }}
+                                    <div class="d-md-none mt-1 small text-muted">
+                                        {{ article.author.get_full_name|default:article.author.username }} - 
+                                        {{ article.created_at|date:"M d, Y" }}
+                                    </div>
+                                </td>
+                                <td class="d-none d-md-table-cell">{{ article.author.get_full_name|default:article.author.username }}</td>
+                                <td class="d-none d-md-table-cell">{{ article.category.name|default:"-" }}</td>
+                                <td class="d-none d-lg-table-cell">{{ article.created_at|date:"M d, Y" }}</td>
+                                <td>
+                                    <div class="btn-group btn-group-sm">
+                                        <button class="btn btn-outline-success" onclick="updateArticleState('{{ article.id }}', 'draft')">
+                                            <i class="bi bi-arrow-counterclockwise"></i> 
+                                            {% if LANGUAGE_CODE == 'ar' %}استعادة{% else %}Restore{% endif %}
+                                        </button>
+                                        <a href="{% url 'article_delete' slug=article.slug %}" class="btn btn-outline-danger">
+                                            <i class="bi bi-trash"></i> 
+                                            {% if LANGUAGE_CODE == 'ar' %}حذف نهائي{% else %}Delete{% endif %}
+                                        </a>
+                                    </div>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        {% else %}
+            <div class="card">
+                <div class="card-body text-center py-4">
+                    <i class="bi bi-archive text-muted mb-3" style="font-size: 2rem;"></i>
+                    <h4>
+                        {% if LANGUAGE_CODE == 'ar' %}لا توجد مقالات في الأرشيف{% else %}No Archived Articles{% endif %}
+                    </h4>
+                </div>
+            </div>
+        {% endif %}
+    </div>
+</div>
+
+<form id="article-state-form" method="post" action="{% url 'update_article_state' %}" style="display: none;">
+    {% csrf_token %}
+    <input type="hidden" name="article_id" id="article_id">
+    <input type="hidden" name="state" id="article_state">
+</form>
+
+<script>
+function updateArticleState(articleId, state) {
+    document.getElementById('article_id').value = articleId;
+    document.getElementById('article_state').value = state;
+    document.getElementById('article-state-form').submit();
+}
+</script>
+
+<style>
+.dropdown-menu {
+    z-index: 1050;
+    width: fit-content!important;
+    min-width: unset !important;
+    max-width: max-content;
+    position: absolute;
+}
+
+.dark-mode ul.dropdown-menu.dropdown-menu-end {
+    background-color: #2d2d2d;
+    color: #ddd;
+}
+
+.dark-mode a.dropdown-item {
+    color: #ddd;
+}
+.dark-mode a.dropdown-item:hover {
+    background-color: #464646;
+}
+.table-responsive {
+    overflow: visible; /* allow dropdown to overflow */
+}
+
+@media (max-width: 767.98px) {
+    .table-responsive {
+        overflow-x: auto; /* On mobile, allow horizontal scrolling */
+    }
+    
+    .btn-group-sm .btn {
+        padding: 0.25rem 0.5rem;
+    }
+    
+    .dropdown {
+        position: static;
+    }
+    
+    .dropdown-menu {
+        position: fixed;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        min-width: 200px;
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        z-index: 1060;
+    }
+}
+</style>
+{% endblock %}

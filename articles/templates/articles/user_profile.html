@@ -1,0 +1,91 @@
+
+{% extends 'articles/base.html' %}
+
+{% block title %}
+{% if LANGUAGE_CODE == 'ar' %}تحديث الملف الشخصي{% else %}Update Profile{% endif %} | 
+{% if LANGUAGE_CODE == 'ar' %}جيمرز اكاديمي{% else %}Gamers Academy{% endif %}
+{% endblock %}
+
+
+{% block css %}
+<style>
+    
+.card {
+    width: 100%;
+    max-width: 1000px;
+}
+
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-12">
+            <h1 class="mb-4">
+                {% if LANGUAGE_CODE == 'ar' %}تحديث الملف الشخصي{% else %}Update Profile{% endif %}
+            </h1>
+            
+            <!-- Profile Information Form -->
+            <div class="card mb-4 {% if dark_mode %}bg-dark text-light{% endif %}">
+                <div class="card-header">
+                    <h4>{% if LANGUAGE_CODE == 'ar' %}معلومات الحساب{% else %}Account Information{% endif %}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger">
+                                        {% for error in field.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        
+                        <button type="submit" name="submit_profile" class="btn btn-primary">
+                            {% if LANGUAGE_CODE == 'ar' %}حفظ التغييرات{% else %}Save Changes{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+            
+            <!-- Change Password Form -->
+            <div class="card {% if dark_mode %}bg-dark text-light{% endif %}">
+                <div class="card-header">
+                    <h4>{% if LANGUAGE_CODE == 'ar' %}تغيير كلمة المرور{% else %}Change Password{% endif %}</h4>
+                </div>
+                <div class="card-body">
+                    <form method="post">
+                        {% csrf_token %}
+                        
+                        {% for field in password_form %}
+                            <div class="mb-3">
+                                <label for="{{ field.id_for_label }}" class="form-label">{{ field.label }}</label>
+                                {{ field }}
+                                {% if field.errors %}
+                                    <div class="text-danger">
+                                        {% for error in field.errors %}
+                                            {{ error }}
+                                        {% endfor %}
+                                    </div>
+                                {% endif %}
+                            </div>
+                        {% endfor %}
+                        
+                        <button type="submit" name="submit_password" class="btn btn-primary">
+                            {% if LANGUAGE_CODE == 'ar' %}تغيير كلمة المرور{% else %}Change Password{% endif %}
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

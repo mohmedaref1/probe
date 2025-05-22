@@ -1,0 +1,66 @@
+
+.editor-toolbar {
+    display: none;
+    background-color: #f8f9fa;
+    border: 1px solid #ced4da;
+    border-bottom: none;
+    border-radius: 0.25rem 0.25rem 0 0;
+    padding: 0.5rem;
+}
+
+.format-bbcode .editor-toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem;
+}
+
+.editor-toolbar button {
+    background: none;
+    border: none;
+    color: #495057;
+    cursor: pointer;
+    padding: 0.25rem 0.5rem;
+    border-radius: 0.25rem;
+    display: flex;
+    align-items: center;
+    gap: 0.25rem;
+}
+
+.editor-toolbar button:hover {
+    background-color: #e9ecef;
+}
+
+.dark-mode .editor-toolbar {
+    background-color: #2d2d2d;
+    border-color: #444;
+}
+
+.dark-mode .editor-toolbar button {
+    color: #e0e0e0;
+}
+
+.dark-mode .editor-toolbar button:hover {
+    background-color: #444;
+}
+
+.editor-toolbar .divider {
+    display: inline-block;
+    width: 1px;
+    height: 1.5rem;
+    background-color: #ced4da;
+    margin: 0 0.5rem;
+    vertical-align: middle;
+}
+
+.dark-mode .editor-toolbar .divider {
+    background-color: #555;
+}
+
+#article-content {
+    border-top-left-radius: 0;
+    border-top-right-radius: 0;
+}
+
+.editor-container {
+    position: relative;
+}

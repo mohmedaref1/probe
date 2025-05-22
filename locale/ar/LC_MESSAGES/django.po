@@ -1,0 +1,66 @@
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2025-05-22 02:12+0300\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"Language: \n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"Plural-Forms: nplurals=6; plural=n==0 ? 0 : n==1 ? 1 : n==2 ? 2 : n%100>=3 "
+"&& n%100<=10 ? 3 : n%100>=11 && n%100<=99 ? 4 : 5;\n"
+#: .\articles\forms.py:96
+msgid "Username"
+msgstr "اسم المستخدم"
+
+msgid "Email Address"
+msgstr "عنوان البريد الإلكتروني"
+
+msgid "First Name"
+msgstr "الاسم الأول"
+
+msgid "Last Name"
+msgstr "اسم العائلة"
+
+msgid "Profile updated successfully!"
+msgstr "تم تحديث الملف الشخصي بنجاح"
+
+msgid "Password changed successfully!"
+msgstr "تم تغيير كلمة المرور بنجاح"
+
+msgid "New category created!"
+msgstr "تم إنشاء فئة جديدة"
+
+msgid "Article created successfully!"
+msgstr "تم إنشاء المقال بنجاح"
+
+msgid "Create"
+msgstr "إنشاء"
+
+msgid "Article updated successfully!"
+msgstr "تم تحديث المقال بنجاح"
+
+msgid "Edit"
+msgstr "تعديل"
+
+msgid "Article deleted successfully!"
+msgstr "تم حذف المقال بنجاح"
+
+msgid "Invalid parameters"
+msgstr "معلمات غير صالحة"
+
+msgid "Article state updated successfully."
+msgstr "تم تحديث حالة المقال بنجاح"
+
+msgid "Article not found"
+msgstr "لم يتم العثور على المقال"
+

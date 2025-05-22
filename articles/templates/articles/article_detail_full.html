@@ -1,0 +1,186 @@
+{% block extra_css %}
+<style>
+.language-switch {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1000;
+}
+
+.switch {
+    width: 60px;
+    height: 34px;
+    background: #e0e0e0;
+    border-radius: 17px;
+    padding: 3px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.switch-handle {
+    width: 28px;
+    height: 28px;
+    background: white;
+    border-radius: 50%;
+    transition: all 0.3s ease;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+}
+
+.switch.active {
+    background: #2196F3;
+}
+
+.switch.active .switch-handle {
+    transform: translateX(26px);
+}
+
+
+.lang-content {
+    display: none;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.lang-content.active {
+    display: block;
+    opacity: 1;
+}
+
+.language-switcher {
+    display: flex;
+    background: #f0f0f0;
+    border-radius: 20px;
+    padding: 6px;
+    box-shadow: 0 1px 5px rgba(0, 0, 0, 0.1);
+    cursor: pointer;
+    user-select: none;
+    font-weight: 600;
+    color: #666;
+    font-family: system-ui, sans-serif;
+    position: relative;
+    margin-left: auto;
+    justify-content: center;
+    margin-bottom: 10px;
+    max-width: 100px;
+    direction: ltr !important;
+}
+
+
+.switch-option {
+    padding: 8px 16px;
+    border-radius: 6px;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    position: relative;
+    color: #666;
+    font-weight: 500;
+}
+
+.switch-option.active {
+    color: #ffffff !important;
+}
+
+.active-indicator {
+    position: absolute;
+    background: white;
+    border-radius: 6px;
+    box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+    transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+}
+
+
+    /* The sliding background highlight */
+.active-indicator {
+    position: absolute;
+    top: 4px;
+    bottom: 4px;
+    background:  radial-gradient(circle,rgba(63, 94, 251, 1) 0%, rgba(252, 70, 107, 1) 100%);
+    border-radius: 20px;
+    transition: left 0.3s cubic-bezier(0.4, 0, 0.2, 1), width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    z-index: 0;
+  }
+</style>
+{% endblock %}
+<title>{% block title %}{{ article.title }} | {% if LANGUAGE_CODE == 'ar' %}جيمرز اكاديمي{% else %}Gamers Academy{% endif %}{% endblock %}</title>
+
+{% block content %}
+<div class="content-container">
+    {% if multilang %}
+    <div class="language-switcher">
+        <div class="active-indicator"></div>
+        <div class="switch-option active" data-tab="1">AR</div>
+        <div class="switch-option" data-tab="2">EN</div>
+    </div>
+    {% endif %}
+    
+    <div class="container fade-in">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="card mb-4">
+                    <div class="card-body p-md-5 p-4">
+                        <div class="article-content mb-4">
+                            {% if multilang %}
+                                <div class="lang-content active" id="content-ar">
+                                    {{ rendered_content }}
+                                </div>
+                                <div class="lang-content" id="content-en">
+                                    {{ rendered_content_en }}
+                                </div>
+                            {% else %}
+                                {{ rendered_content }}
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const switcher = document.querySelector('.language-switcher');
+        const options = document.querySelectorAll('.switch-option');
+        const indicator = document.querySelector('.active-indicator');
+        const arContent = document.getElementById('content-ar');
+        const enContent = document.getElementById('content-en');
+    
+        // Initialize from URL
+        const urlParams = new URLSearchParams(window.location.search);
+        const initialTab = urlParams.get('tap') || '1';
+        
+        function activateTab(tab) {
+            options.forEach(opt => opt.classList.remove('active'));
+            const activeOpt = Array.from(options).find(opt => opt.dataset.tab === tab);
+            activeOpt.classList.add('active');
+            
+            // Update indicator position
+            const { offsetLeft: left, offsetWidth: width } = activeOpt;
+            indicator.style.cssText = `left: ${left}px; width: ${width}px;`;
+            
+            // Toggle content
+            arContent.classList.toggle('active', tab === '1');
+            enContent.classList.toggle('active', tab === '2');
+        }
+    
+        // Set initial state
+        activateTab(initialTab);
+    
+        // Handle tab clicks
+        options.forEach(opt => {
+            opt.addEventListener('click', function() {
+                const tab = this.dataset.tab;
+                history.replaceState(null, '', `?tap=${tab}`);
+                activateTab(tab);
+            });
+        });
+    
+        // Handle browser navigation
+        window.addEventListener('popstate', () => {
+            const tab = new URLSearchParams(window.location.search).get('tap') || '1';
+            activateTab(tab);
+        });
+    });
+    </script>
+{% endblock %}
